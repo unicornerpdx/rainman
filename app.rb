@@ -21,7 +21,7 @@ class App < Jsonatra::Base
     param_error :key, 'missing', 'key parameter required' if params[:key].blank?
     param_error :value, 'missing', 'value parameter required' if params[:value].blank?
     param_error :number, 'missing', 'number parameter required' if params[:number].blank?
-    param_error :number, 'invalid', 'number must be an integer' unless params[:number] && params[:number].match(/^[0-9]+$/)
+    param_error :number, 'invalid', 'number must be an integer' unless params[:number] && params[:number].to_s.match(/^[0-9]+$/)
 
     halt if response.error?
 
