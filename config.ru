@@ -2,7 +2,7 @@ Encoding.default_internal = 'UTF-8'
 require 'rubygems'
 Bundler.require
 
-require 'yaml'
+require './env.rb'
 require './app.rb'
 
 run App

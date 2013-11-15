@@ -6,11 +6,15 @@ GEM
     json (1.8.1)
     jsonatra (1.0.2)
       sinatra
+    logger (1.2.8)
     method_source (0.8.2)
+    pg (0.17.0)
     pry (0.9.12.3)
       coderay (~> 1.0)
       method_source (~> 0.8)
       slop (~> 3.4)
+    puma (2.6.0)
+      rack (>= 1.1, < 2.0)
     rack (1.5.2)
     rack-protection (1.5.1)
       rack
@@ -30,6 +34,9 @@ DEPENDENCIES
   httpclient
   json
   jsonatra
+  logger
+  pg
   pry
+  puma
   shotgun
   sinatra
