@@ -1,7 +1,7 @@
-Version Tracking API
-====================
+Rainman
+=======
 
-This is a simple JSON-based API for tracking versions of SDKs or other software in the wild.
+This is a simple JSON-based API for tracking usage info and version info of SDKs or other software in the wild.
 
 
 Usage
