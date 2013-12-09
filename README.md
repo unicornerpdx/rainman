@@ -50,8 +50,51 @@ After you've gathered some aggregates of these counts, send the total for each c
 combination in a POST request to the `/report` endpoint. The existing count for the day will be updated
 with the value of `number` provided.
 
+`GET /query`
 
+* keys - List<String>, required
+* value - String, optional
+* client_id - String, optional
+* from - YYYMMDD, optional
+* to - YYYMMDD, optional
 
+The `client_id` parameter filters by client. It can be omitted if you want global usage.
+
+The `keys` parameter filters by one or more keys.
+
+The `value` parameter can only be used for filtering if only a single key is provided.
+
+The `from` and `to` parameters can be used to filter by a date range (inclusive).
+
+Example queries:
+* **/query?client_id=1234&key=device-os&value=android&from=20130101&to=20131225** android usage for a date range
+* **/query?key=client-name** global client usage by day
+
+Results will be returned in the following format, ordered by date (ascending):
+
+```javascript
+// GET /query?keys=test_key,another_test_key
+[
+    {
+        "another_test_key": {
+            "additional_test_value": 23
+        },
+        "date": "2013-12-08"
+    },
+    {
+        "another_test_key": {
+            "additional_test_value": 23,
+            "another_test_value": 3,
+            "test_value": 19
+        },
+        "date": "2013-12-09",
+        "test_key": {
+            "another_test_value": 9000,
+            "test_value": 2
+        }
+    }
+]
+```
 
 Android
 -------

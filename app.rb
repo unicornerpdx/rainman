@@ -8,6 +8,10 @@ class App < Jsonatra::Base
               WHERE NOT EXISTS (SELECT 1 FROM stats 
                 WHERE client_id=$2::text AND date=$3::timestamp AND key=$4::text AND value=$5::text)"
 
+  configure do
+    set :arrayified_params, [:keys]
+  end
+
   get '/' do
     {
       hello: 'world'
@@ -33,6 +37,38 @@ class App < Jsonatra::Base
     {
       result: "ok"
     }
+  end
+
+  get '/query' do
+    param_error :keys, 'missing', 'key parameter required' if params[:keys].size == 0
+    param_error :value, 'invalid', 'value parameter cannot be specified when requesting multiple keys' if !params[:value].blank? and params[:keys].size > 1
+    param_error :from, 'invalid', 'date parameter should look like YYYYMMDD' if params[:from] && !params[:from].match(/^\d{8}$/)
+    param_error :to, 'invalid', 'date parameter should look like YYYYMMDD' if params[:to] && !params[:to].match(/^\d{8}$/)
+
+    halt if response.error?
+
+    stats = STATS.filter(key: params[:keys])
+
+    # filter by optional arguments
+    stats.filter!(client_id: params[:client_id]) if params[:client_id]
+    stats.filter!(value: params[:value]) if params[:value]
+    stats.filter!{date >= params[:from]} if params[:from]
+    stats.filter!{date <= params[:to]} if params[:to]
+
+    stats.order_by!(:date, :key, :value)
+
+    # construct response object
+    results = {}
+    stats.each{ |s|
+      key = s[:key]
+      date = s[:date]
+      results[date] = results[date] || {}
+      results[date][key] = results[date][key] || {}
+      results[date][key][s[:value]] = s[:num]
+      results[date][:date] = date.strftime '%Y-%m-%d'
+    }
+
+    results.values.to_json
   end
 
 end

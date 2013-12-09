@@ -5,7 +5,7 @@ require './env.rb'
 
 namespace :db do
   task :setup do
-    DB.create_table :stats do
+    SQL.create_table :stats do
       primary_key [:client_id, :date, :key, :value]
       String :client_id
       DateTime :date

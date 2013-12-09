@@ -5,6 +5,7 @@ gem 'json'
 gem 'jsonatra'
 gem 'httpclient'
 gem 'pg'
+gem 'sequel'
 gem 'logger'
 
 gem 'puma'

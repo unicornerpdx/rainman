@@ -9,15 +9,16 @@ GEM
     logger (1.2.8)
     method_source (0.8.2)
     pg (0.17.0)
-    pry (0.9.12.3)
+    pry (0.9.12.4)
       coderay (~> 1.0)
       method_source (~> 0.8)
       slop (~> 3.4)
-    puma (2.6.0)
+    puma (2.7.0)
       rack (>= 1.1, < 2.0)
     rack (1.5.2)
     rack-protection (1.5.1)
       rack
+    sequel (4.5.0)
     shotgun (0.9)
       rack (>= 1.0)
     sinatra (1.4.4)
@@ -38,5 +39,6 @@ DEPENDENCIES
   pg
   pry
   puma
+  sequel
   shotgun
   sinatra
