@@ -19,7 +19,7 @@ of all.
 API
 ---
 
-`POST /report`
+### `POST /report`
 
 * date - YYYYMMDD
 * client_id - String
@@ -50,7 +50,7 @@ After you've gathered some aggregates of these counts, send the total for each c
 combination in a POST request to the `/report` endpoint. The existing count for the day will be updated
 with the value of `number` provided.
 
-`GET /query`
+### `GET /query`
 
 * keys - List<String>, required
 * value - String, optional
