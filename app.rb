@@ -1,12 +1,12 @@
 class App < Jsonatra::Base
 
   puts "Preparing SQL statements"
-  DB.prepare 'updatestat', "UPDATE stats SET num=num+$1::int 
-                        WHERE client_id=$2::text AND date=$3::timestamp AND key=$4::text AND value=$5::text"
-  DB.prepare 'insertstat', "INSERT INTO stats (client_id, date, key, value, num)
-              SELECT $2::text, $3::timestamp, $4::text, $5::text, $1::int
-              WHERE NOT EXISTS (SELECT 1 FROM stats 
-                WHERE client_id=$2::text AND date=$3::timestamp AND key=$4::text AND value=$5::text)"
+  DB.prepare 'updatestat', "UPDATE stats SET num=num+$1::int
+                        WHERE group_id=$2::text AND client_id=$3::text AND date=$4::timestamp AND key=$5::text AND value=$6::text"
+  DB.prepare 'insertstat', "INSERT INTO stats (group_id, client_id, date, key, value, num)
+              SELECT $2::text, $3::text, $4::timestamp, $5::text, $6::text, $1::int
+              WHERE NOT EXISTS (SELECT 1 FROM stats
+                WHERE group_id=$2::text AND client_id=$3::text AND date=$4::timestamp AND key=$5::text AND value=$6::text)"
 
   configure do
     set :arrayified_params, [:keys]
@@ -21,6 +21,7 @@ class App < Jsonatra::Base
   post '/report' do
     param_error :date, 'missing', 'date parameter required' if params[:date].blank?
     param_error :date, 'invalid', 'date parameter should look like YYYYMMDD' unless params[:date] && params[:date].match(/^\d{8}$/)
+    # group_id is allowed to be null
     param_error :client_id, 'missing', 'client_id parameter required' if params[:client_id].blank?
     param_error :key, 'missing', 'key parameter required' if params[:key].blank?
     param_error :value, 'missing', 'value parameter required' if params[:value].blank?
@@ -30,8 +31,8 @@ class App < Jsonatra::Base
     halt if response.error?
 
     DB.exec 'BEGIN'
-    DB.exec_prepared 'updatestat', [params[:number], params[:client_id], params[:date], params[:key], params[:value]]
-    DB.exec_prepared 'insertstat', [params[:number], params[:client_id], params[:date], params[:key], params[:value]]
+    DB.exec_prepared 'updatestat', [params[:number], params[:group_id], params[:client_id], params[:date], params[:key], params[:value]]
+    DB.exec_prepared 'insertstat', [params[:number], params[:group_id], params[:client_id], params[:date], params[:key], params[:value]]
     DB.exec 'COMMIT'
 
     {
@@ -50,6 +51,7 @@ class App < Jsonatra::Base
     stats = STATS.filter(key: params[:keys])
 
     # filter by optional arguments
+    stats.filter!(group_id: params[:group_id]) if params[:group_id]
     stats.filter!(client_id: params[:client_id]) if params[:client_id]
     stats.filter!(value: params[:value]) if params[:value]
     stats.filter!{date >= params[:from]} if params[:from]

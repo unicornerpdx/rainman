@@ -7,12 +7,12 @@ This is a simple JSON-based API for tracking usage info and version info of SDKs
 Usage
 -----
 
-Using whatever method you prefer, aggregate stats in a local cache in your app for a short time, 
+Using whatever method you prefer, aggregate stats in a local cache in your app for a short time,
 such as 5 minutes. We commonly use Redis for this. At some interval you decide (5-10 minutes),
 send the batch of counts to this API.
 
-The service aggregates counts by date/client_id/key/value, storing one row for each unique
-combination of all 4. The stats can later be queried by date, client_id, key, or combinations
+The service aggregates counts by date/group_id/client_id/key/value, storing one row for each unique
+combination of all 5. The stats can later be queried by date, group_id, client_id, key, or combinations
 of all.
 
 
@@ -22,12 +22,14 @@ API
 ### `POST /report`
 
 * date - YYYYMMDD
+* group_id - String (can be null)
 * client_id - String
 * key - String
 * value - String
 * number - Integer
 
-The `client_id` parameter exists to track usage based on installed application.
+The `group_id` parameter exists to track usage based on groups.
+The `client_id` parameter exists to track usage based on specific instances within a group.
 
 The `key` and `value` parameters are what do the real work. This is best illustrated by some examples.
 
@@ -46,7 +48,7 @@ Tracking app versions:
 * Key: `package_name` Value: `com.esri.sample-app`
 * Key: `package_version` Value: `1.0.1`
 
-After you've gathered some aggregates of these counts, send the total for each client_id/date/key/value 
+After you've gathered some aggregates of these counts, send the total for each group_id/client_id/date/key/value
 combination in a POST request to the `/report` endpoint. The existing count for the day will be updated
 with the value of `number` provided.
 
@@ -54,11 +56,14 @@ with the value of `number` provided.
 
 * keys - List<String>, required
 * value - String, optional
+* group_id - String, optional
 * client_id - String, optional
 * from - YYYMMDD, optional
 * to - YYYMMDD, optional
 
-The `client_id` parameter filters by client. It can be omitted if you want global usage.
+The `group_id` parameter filters by group. It can be omitted if you want global usage.
+
+The `client_id` parameter filters by client. It can be omitted if you want group-level usage.
 
 The `keys` parameter filters by one or more keys.
 
@@ -67,7 +72,7 @@ The `value` parameter can only be used for filtering if only a single key is pro
 The `from` and `to` parameters can be used to filter by a date range (inclusive).
 
 Example queries:
-* **/query?client_id=1234&key=device-os&value=android&from=20130101&to=20131225** android usage for a date range
+* **/query?group_id=abcd&client_id=1234&key=device-os&value=android&from=20130101&to=20131225** android usage for a date range
 * **/query?key=client-name** global client usage by day
 
 Results will be returned in the following format, ordered by date (ascending):
