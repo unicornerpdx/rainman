@@ -21,7 +21,7 @@ API
 
 ### `POST /report`
 
-* date - YYYYMMDD
+* date - YYYY-MM-DD
 * group_id - String (can be null)
 * client_id - String
 * key - String
@@ -58,8 +58,8 @@ with the value of `number` provided.
 * value - String, optional
 * group_id - String, optional
 * client_id - String, optional
-* from - YYYMMDD, optional
-* to - YYYMMDD, optional
+* from - YYYY-MM-DD, optional
+* to - YYYY-MM-DD, optional
 
 The `group_id` parameter filters by group. It can be omitted if you want global usage.
 
@@ -72,7 +72,7 @@ The `value` parameter can only be used for filtering if only a single key is pro
 The `from` and `to` parameters can be used to filter by a date range (inclusive).
 
 Example queries:
-* **/query?group_id=abcd&client_id=1234&key=device-os&value=android&from=20130101&to=20131225** android usage for a date range
+* **/query?group_id=abcd&client_id=1234&key=device-os&value=android&from=2013-01-01&to=2013-12-25** android usage for a date range
 * **/query?key=client-name** global client usage by day
 
 Results will be returned in the following format, ordered by date (ascending):
