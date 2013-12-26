@@ -7,6 +7,7 @@ gem 'httpclient'
 gem 'pg'
 gem 'sequel'
 gem 'logger'
+gem 'rake'
 
 gem 'puma'
 gem 'shotgun'
