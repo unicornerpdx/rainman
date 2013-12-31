@@ -18,6 +18,8 @@ GEM
     rack (1.5.2)
     rack-protection (1.5.1)
       rack
+    rack-test (0.6.2)
+      rack (>= 1.0)
     rake (10.1.0)
     sequel (4.5.0)
     shotgun (0.9)
@@ -40,6 +42,7 @@ DEPENDENCIES
   pg
   pry
   puma
+  rack-test
   rake
   sequel
   shotgun

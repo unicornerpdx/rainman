@@ -12,3 +12,5 @@ gem 'rake'
 gem 'puma'
 gem 'shotgun'
 gem 'pry'
+
+gem 'rack-test'
