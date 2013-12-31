@@ -20,7 +20,7 @@ class App < Jsonatra::Base
 
   post '/report' do
     param_error :date, 'missing', 'date parameter required' if params[:date].blank?
-    param_error :date, 'invalid', 'date parameter should look like YYYYMMDD' unless params[:date] && params[:date].match(/^\d{8}$/)
+    param_error :date, 'invalid', 'date parameter should look like YYYY-MM-DD' unless params[:date] && params[:date].match(/^\d{4}-\d{2}-\d{2}$/)
     # group_id is allowed to be null
     param_error :client_id, 'missing', 'client_id parameter required' if params[:client_id].blank?
     param_error :key, 'missing', 'key parameter required' if params[:key].blank?
@@ -41,10 +41,10 @@ class App < Jsonatra::Base
   end
 
   get '/query' do
-    param_error :keys, 'missing', 'key parameter required' if params[:keys].size == 0
+    param_error :keys, 'missing', 'keys parameter required' if params[:keys] == nil || params[:keys].size == 0
     param_error :value, 'invalid', 'value parameter cannot be specified when requesting multiple keys' if !params[:value].blank? and params[:keys].size > 1
-    param_error :from, 'invalid', 'date parameter should look like YYYYMMDD' if params[:from] && !params[:from].match(/^\d{8}$/)
-    param_error :to, 'invalid', 'date parameter should look like YYYYMMDD' if params[:to] && !params[:to].match(/^\d{8}$/)
+    param_error :from, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:from] && !params[:from].match(/^\d{4}-\d{2}-\d{2}$/)
+    param_error :to, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:to] && !params[:to].match(/^\d{4}-\d{2}-\d{2}$/)
 
     halt if response.error?
 
@@ -53,9 +53,9 @@ class App < Jsonatra::Base
     # filter by optional arguments
     stats.filter!(group_id: params[:group_id]) if params[:group_id]
     stats.filter!(client_id: params[:client_id]) if params[:client_id]
-    stats.filter!(value: params[:value]) if params[:value]
-    stats.filter!{date >= params[:from]} if params[:from]
-    stats.filter!{date <= params[:to]} if params[:to]
+    stats.filter!(value: params[:value]) if params[:value]    
+    stats.filter!("date >= ?", params[:from]) if params[:from]
+    stats.filter!("date <= ?", params[:to]) if params[:to]
 
     stats.order_by!(:date, :key, :value)
 
