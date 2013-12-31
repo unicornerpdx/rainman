@@ -4,6 +4,10 @@ class AppTest < MiniTest::Unit::TestCase
 
   include Rack::Test::Methods
 
+  def setup
+    DB.exec 'DELETE FROM stats'
+  end
+
   def app
     App
   end
@@ -76,5 +80,63 @@ class AppTest < MiniTest::Unit::TestCase
     assert_equal 'invalid', response['error']['parameters']['number'][0]['type']
     assert_equal 'number must be an integer', response['error']['parameters']['number'][0]['message']
   end
+
+  def test_report_accepts_group_id
+    post '/report', { group_id: '10000' }
+    response = JSON.parse last_response.body
+    assert_nil response['error']['parameters']['group_id']
+  end
+
+  def test_report_segments_data_by_group
+    post '/report', { 
+      group_id: 'group-a',
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 1
+    }
+
+    post '/report', { 
+      group_id: 'group-b',
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 1
+    }
+
+    group_a = STATS.filter(group_id: 'group-a').first[:num]
+    group_b = STATS.filter(group_id: 'group-b').first[:num]
+
+    assert_equal 1, group_a
+    assert_equal 1, group_b
+  end
+
+  def test_report_segments_data_by_client
+    post '/report', { 
+      group_id: 'group-a',
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 1
+    }
+
+    post '/report', { 
+      group_id: 'group-a',
+      client_id: 'client-2',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 1
+    }
+
+    assert_equal 2, STATS.filter(group_id: 'group-a').count # should insert as two separate rows
+    assert_equal 1, STATS.filter(group_id: 'group-a', client_id: 'client-1').first[:num]
+    assert_equal 1, STATS.filter(group_id: 'group-a', client_id: 'client-2').first[:num]
+  end
+
+
 
 end

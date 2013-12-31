@@ -5,7 +5,11 @@ end
 
 require 'yaml'
 
-SiteConfig = YAML.load_file('config.yml')
+if ENV['RACK_ENV'] == 'test'
+  SiteConfig = YAML.load_file('config-test.yml')
+else
+  SiteConfig = YAML.load_file('config.yml')
+end
 
 DB = PG.connect({ 
   host: SiteConfig['db']['host'],

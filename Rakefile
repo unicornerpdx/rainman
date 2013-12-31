@@ -6,7 +6,6 @@ Bundler.require
 require './env.rb'
 
 Rake::TestTask.new do |t|
-#  t.libs << 'app'
   t.test_files = FileList['test/rainman/*_test.rb']
   t.verbose = true
 end
