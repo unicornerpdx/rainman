@@ -8,6 +8,7 @@ GEM
       sinatra
     logger (1.2.8)
     method_source (0.8.2)
+    minitest (4.7.5)
     pg (0.17.0)
     pry (0.9.12.4)
       coderay (~> 1.0)
@@ -39,6 +40,7 @@ DEPENDENCIES
   json
   jsonatra
   logger
+  minitest
   pg
   pry
   puma

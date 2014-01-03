@@ -87,6 +87,19 @@ class AppTest < MiniTest::Unit::TestCase
     assert_nil response['error']['parameters']['group_id']
   end
 
+  def test_report_without_group
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 10
+    }
+
+    assert_equal 1, STATS.filter(client_id: 'client-1').count
+    assert_equal 10, STATS.filter(client_id: 'client-1').first[:num]
+  end
+
   def test_report_segments_data_by_group
     post '/report', { 
       group_id: 'group-a',
@@ -137,6 +150,68 @@ class AppTest < MiniTest::Unit::TestCase
     assert_equal 1, STATS.filter(group_id: 'group-a', client_id: 'client-2').first[:num]
   end
 
+  def test_report_segments_data_by_date
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 5
+    }
 
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-02',
+      key: 'version',
+      value: '1.0',
+      number: 6
+    }
+
+    assert_equal 2, STATS.filter(client_id: 'client-1').count
+    assert_equal 5, STATS.filter(client_id: 'client-1', date: '2014-01-01').first[:num]
+    assert_equal 6, STATS.filter(client_id: 'client-1', date: '2014-01-02').first[:num]
+  end
+
+  def test_report_segments_data_by_value
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 5
+    }
+
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-02',
+      key: 'version',
+      value: '1.1',
+      number: 6
+    }
+
+    assert_equal 2, STATS.filter(client_id: 'client-1').count
+    assert_equal 5, STATS.filter(client_id: 'client-1', value: '1.0').first[:num]
+    assert_equal 6, STATS.filter(client_id: 'client-1', value: '1.1').first[:num]
+  end
+
+  def test_report_increments_num
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 2
+    }
+
+    post '/report', {
+      client_id: 'client-1',
+      date: '2014-01-01',
+      key: 'version',
+      value: '1.0',
+      number: 3
+    }
+
+    assert_equal 5, STATS.filter(client_id: 'client-1', date: '2014-01-01').first[:num]
+  end
 
 end

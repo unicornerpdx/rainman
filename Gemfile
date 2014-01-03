@@ -14,3 +14,4 @@ gem 'shotgun'
 gem 'pry'
 
 gem 'rack-test'
+gem 'minitest'
