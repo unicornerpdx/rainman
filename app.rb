@@ -31,8 +31,8 @@ class App < Jsonatra::Base
     halt if response.error?
 
     DB.exec 'BEGIN'
-    DB.exec_prepared 'updatestat', [params[:number], params[:group_id], params[:client_id], params[:date], params[:key], params[:value]]
-    DB.exec_prepared 'insertstat', [params[:number], params[:group_id], params[:client_id], params[:date], params[:key], params[:value]]
+    DB.exec_prepared 'updatestat', [params[:number], params[:group_id] || '', params[:client_id], params[:date], params[:key], params[:value]]
+    DB.exec_prepared 'insertstat', [params[:number], params[:group_id] || '', params[:client_id], params[:date], params[:key], params[:value]]
     DB.exec 'COMMIT'
 
     {
