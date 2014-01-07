@@ -79,26 +79,28 @@ Results will be returned in the following format, ordered by date (ascending):
 
 ```javascript
 // GET /query?keys=test_key,another_test_key
-[
-    {
-        "another_test_key": {
-            "additional_test_value": 23
+{
+    "data": [
+        {
+            "another_test_key": {
+                "additional_test_value": 23
+            },
+            "date": "2013-12-08"
         },
-        "date": "2013-12-08"
-    },
-    {
-        "another_test_key": {
-            "additional_test_value": 23,
-            "another_test_value": 3,
-            "test_value": 19
-        },
-        "date": "2013-12-09",
-        "test_key": {
-            "another_test_value": 9000,
-            "test_value": 2
+        {
+            "another_test_key": {
+                "additional_test_value": 23,
+                "another_test_value": 3,
+                "test_value": 19
+            },
+            "date": "2013-12-09",
+            "test_key": {
+                "another_test_value": 9000,
+                "test_value": 2
+            }
         }
-    }
-]
+    ]
+}
 ```
 
 Android

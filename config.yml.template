@@ -1,5 +1,18 @@
-db: 
-  host: 'localhost'
-  port: 5432
-  user: 
-  name: 'usage_tracking'
+development:
+  db: 
+    host: 'localhost'
+    port: 5432
+    user: 
+    name: 'rainman_dev'
+test:
+  db: 
+    host: 'localhost'
+    port: 5432
+    user: 
+    name: 'rainman_test'
+production:
+  db: 
+    host: 'localhost'
+    port: 5432
+    user: 
+    name: 'rainman'

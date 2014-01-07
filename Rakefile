@@ -1,7 +1,14 @@
+Encoding.default_internal = 'UTF-8'
 require 'rubygems'
+require 'rake/testtask'
 Bundler.require
 
 require './env.rb'
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/rainman/*_test.rb']
+  t.verbose = true
+end
 
 namespace :db do
   task :setup do
