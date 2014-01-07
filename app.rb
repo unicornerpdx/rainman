@@ -70,7 +70,7 @@ class App < Jsonatra::Base
       results[date][:date] = date.strftime '%Y-%m-%d'
     }
 
-    results.values.to_json
+    { data: results.values }.to_json
   end
 
 end
