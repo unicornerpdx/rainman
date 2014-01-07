@@ -5,10 +5,10 @@ end
 
 require 'yaml'
 
-if ENV['RACK_ENV'] == 'test'
-  SiteConfig = YAML.load_file('config-test.yml')
+if ENV['RACK_ENV']
+  SiteConfig = YAML.load_file('config.yml')[ENV['RACK_ENV']]
 else
-  SiteConfig = YAML.load_file('config.yml')
+  SiteConfig = YAML.load_file('config.yml')['development']
 end
 
 DB = PG.connect({ 
