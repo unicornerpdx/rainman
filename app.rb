@@ -1,12 +1,14 @@
 class App < Jsonatra::Base
 
-  puts "Preparing SQL statements"
-  DB.prepare 'updatestat', "UPDATE stats SET num=num+$1::int
-                        WHERE group_id=$2::text AND client_id=$3::text AND date=$4::timestamp AND key=$5::text AND value=$6::text"
-  DB.prepare 'insertstat', "INSERT INTO stats (group_id, client_id, date, key, value, num)
-              SELECT $2::text, $3::text, $4::timestamp, $5::text, $6::text, $1::int
-              WHERE NOT EXISTS (SELECT 1 FROM stats
-                WHERE group_id=$2::text AND client_id=$3::text AND date=$4::timestamp AND key=$5::text AND value=$6::text)"
+  ds = SQL["UPDATE stats SET num=num + ?::int
+            WHERE group_id=?::text AND client_id=?::text AND date=?::timestamp AND key=?::text AND value=?::text", :$number, :$group, :$client, :$date, :$key, :$value]
+  ds.prepare(:update, :update_stat)
+
+  ds = SQL["INSERT INTO stats (group_id, client_id, date, key, value, num)
+            SELECT ?::text, ?::text, ?::timestamp, ?::text, ?::text, ?::int
+            WHERE NOT EXISTS (SELECT 1 FROM stats
+                              WHERE group_id=?::text AND client_id=?::text AND date=?::timestamp AND key=?::text AND value=?::text)", :$group, :$client, :$date, :$key, :$value, :$number, :$group, :$client, :$date, :$key, :$value]
+  ds.prepare(:insert, :insert_stat)
 
   configure do
     set :arrayified_params, [:keys]
@@ -30,10 +32,8 @@ class App < Jsonatra::Base
 
     halt if response.error?
 
-    DB.exec 'BEGIN'
-    DB.exec_prepared 'updatestat', [params[:number], params[:group_id] || '', params[:client_id], params[:date], params[:key], params[:value]]
-    DB.exec_prepared 'insertstat', [params[:number], params[:group_id] || '', params[:client_id], params[:date], params[:key], params[:value]]
-    DB.exec 'COMMIT'
+    SQL.call :update_stat, :number => params[:number], :group => (params[:group_id] || ''), :client => params[:client_id], :date => params[:date], :key => params[:key], :value => params[:value]
+    SQL.call :insert_stat, :number => params[:number], :group => (params[:group_id] || ''), :client => params[:client_id], :date => params[:date], :key => params[:key], :value => params[:value]
 
     {
       result: "ok"
@@ -70,7 +70,9 @@ class App < Jsonatra::Base
       results[date][:date] = date.strftime '%Y-%m-%d'
     }
 
-    { data: results.values }.to_json
+    { 
+      data: results.values 
+    }
   end
 
 end

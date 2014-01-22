@@ -9,7 +9,7 @@ class QueryTest < MiniTest::Unit::TestCase
   end
 
   def setup
-    DB.exec 'DELETE FROM stats'
+    SQL.run 'DELETE FROM stats'
 
     # Insert a bunch of test data to query
 
