@@ -5,7 +5,7 @@ class ReportTest < MiniTest::Unit::TestCase
   include Rack::Test::Methods
 
   def setup
-    DB.exec 'DELETE FROM stats'
+    SQL.run 'DELETE FROM stats'
   end
 
   def app
