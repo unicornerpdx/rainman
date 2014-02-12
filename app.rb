@@ -48,7 +48,10 @@ class App < Jsonatra::Base
 
     halt if response.error?
 
-    stats = STATS.filter(key: params[:keys])
+    stats = STATS.select_group(:date, :key, :value)
+    stats.select_append!{sum(num).as(num)}
+
+    stats.filter!(key: params[:keys])
 
     # filter by optional arguments
     stats.filter!(group_id: params[:group_id]) if params[:group_id]
