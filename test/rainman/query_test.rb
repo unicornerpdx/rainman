@@ -139,10 +139,10 @@ class QueryTest < MiniTest::Unit::TestCase
     response = JSON.parse last_response.body
     assert_equal 2, response['data'].length
     assert_equal '2014-01-01', response['data'][0]['date']
-    assert_equal 2, response['data'][0]['version']['1.0']
-    assert_equal 3, response['data'][0]['version']['1.1']
-    assert_equal 4, response['data'][1]['version']['1.0']
-    assert_equal 5, response['data'][1]['version']['1.1']
+    assert_equal 8, response['data'][0]['version']['1.0']
+    assert_equal 12, response['data'][0]['version']['1.1']
+    assert_equal 16, response['data'][1]['version']['1.0']
+    assert_equal 20, response['data'][1]['version']['1.1']
   end
 
   def test_query_of_summed_values
