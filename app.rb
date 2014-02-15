@@ -42,9 +42,19 @@ class App < Jsonatra::Base
 
   get '/query' do
     param_error :keys, 'missing', 'keys parameter required' if params[:keys] == nil || params[:keys].size == 0
-    param_error :value, 'invalid', 'value parameter cannot be specified when requesting multiple keys' if !params[:value].blank? and params[:keys].size > 1
+    param_error :value, 'invalid', 'value parameter cannot be specified when requesting multiple keys' if (params[:value] || !params[:value].blank?) and params[:keys].size > 1
     param_error :from, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:from] && !params[:from].match(/^\d{4}-\d{2}-\d{2}$/)
     param_error :to, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:to] && !params[:to].match(/^\d{4}-\d{2}-\d{2}$/)
+
+    # jsonatra doesn't split query string parameters into an array right now
+    # https://github.com/esripdx/jsonatra/issues/3
+    if String === params[:value]
+      params[:value] = params[:value].split ','
+    end
+
+    if params[:format] == 'panic'
+      param_error :keys, 'invalid', 'only one key can be specified when format=panic' if params[:keys].size > 1
+    end
 
     halt if response.error?
 
@@ -62,20 +72,50 @@ class App < Jsonatra::Base
 
     stats.order_by!(:date, :key, :value)
 
-    # construct response object
-    results = {}
-    stats.each{ |s|
-      key = s[:key]
-      date = s[:date]
-      results[date] = results[date] || {}
-      results[date][key] = results[date][key] || {}
-      results[date][key][s[:value]] = s[:num]
-      results[date][:date] = date.strftime '%Y-%m-%d'
-    }
+    if params[:format] == 'panic'
+      # JSON format for Panic StatusBoard
 
-    { 
-      data: results.values 
-    }
+      results = {}
+      stats.each{ |s|
+        value = s[:value]
+        date = s[:date]
+        results[value] = {
+          :title => value,
+          :datapoints => []
+        } if results[value].nil?
+        results[value][:datapoints] << {
+          :title => date.strftime('%b %-d'),
+          :value => s[:num]
+        }
+      }
+
+      sequences = results.values
+
+      {
+        graph: {
+          title: (params[:title] || params[:keys][0].split('_').map{|w| w.capitalize}.join(' ')),
+          refreshEveryNSeconds: 120,
+          type: "bar",
+          datasequences: sequences
+        }
+      }
+    else
+      # Standard JSON format
+
+      results = {}
+      stats.each{ |s|
+        key = s[:key]
+        date = s[:date]
+        results[date] = results[date] || {}
+        results[date][key] = results[date][key] || {}
+        results[date][key][s[:value]] = s[:num]
+        results[date][:date] = date.strftime '%Y-%m-%d'
+      }
+
+      { 
+        data: results.values 
+      }
+    end
   end
 
 end
