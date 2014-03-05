@@ -75,21 +75,40 @@ class App < Jsonatra::Base
     if params[:format] == 'panic'
       # JSON format for Panic StatusBoard
 
+      # Collect all the dates
+      dates = stats.map{|s| s[:date]}.uniq.sort
+      # Set the values for each date for each key to 0, to ensure each key has values for each date
+
+      datapoints = {}
+      dates.each do |d| 
+        datapoints[d.strftime('%b %-d')] = {
+          :title => d.strftime('%b %-d'),
+          :value => 0
+        }
+      end
+
       results = {}
-      stats.each{ |s|
+      stats.each do |s|
         value = s[:value]
-        date = s[:date]
-        results[value] = {
-          :title => value,
-          :datapoints => []
-        } if results[value].nil?
-        results[value][:datapoints] << {
-          :title => date.strftime('%b %-d'),
+        # Set up the initial data
+        if results[value].nil?
+          results[value] = {
+            :title => value,
+            :datapoints => datapoints.clone
+          } 
+        end
+        results[value][:datapoints][s[:date].strftime('%b %-d')] = {
+          :title => s[:date].strftime('%b %-d'),
           :value => s[:num]
         }
-      }
+      end
 
       sequences = results.values
+
+      # Remove the date key from the datapoints objects
+      sequences.each do |s|
+        s[:datapoints] = s[:datapoints].values
+      end
 
       {
         graph: {
