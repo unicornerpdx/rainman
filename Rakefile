@@ -56,16 +56,8 @@ namespace :debug do
 
     def format_date when_day
       unless when_day.is_a? DateTime or when_day.is_a? Date or when_day.is_a? Time
-
-        new_day = Date.strptime when_day, "%Y-%M-%D"
-        unless new_day
-          new_day = Date.strptime when_day, "%M/%D/%Y"
-        end
-
-        raise Exception.new "Date format should be YYYY-MM-DD or MM/DD/YYYY" if not new_day
-
+        new_day = Date.strptime when_day, "%Y-%m-%d"
         when_day = new_day
-
       end
       
       "#{when_day.year}-#{when_day.month}-#{when_day.day}"
@@ -73,8 +65,8 @@ namespace :debug do
 
     first_entry_date = Stat.order(:date).first.date
     last_entry_date = Stat.order(:date).last.date
-    start_date =  ENV['start']  ? format_date(Chronic.parse(ENV['start'])) : format_date(first_entry_date)
-    end_date =    ENV['end']    ? format_date(Chronic.parse(ENV['end'])) : format_date(last_entry_date)
+    start_date =  ENV['start']  ? format_date(ENV['start']) : format_date(first_entry_date)
+    end_date =    ENV['end']    ? format_date(ENV['end']) : format_date(last_entry_date)
 
     puts "Searcing for records between #{start_date} and #{end_date}"
     puts "Real Client ID\tReal Group ID\tDate" if ENV['verbose']
