@@ -15,6 +15,6 @@ db_url = "postgres://%s@%s:%d/%s" % [
     SiteConfig['db']['user'], SiteConfig['db']['host'], SiteConfig['db']['port'], SiteConfig['db']['name']
 ]
 SQL = Sequel.connect(db_url)
-# SQL.loggers << Logger.new($stdout)
+SQL.loggers << Logger.new($stdout) if ENV['RACK_ENV'] == 'development'
 
 STATS = SQL[:stats]
