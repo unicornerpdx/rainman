@@ -22,13 +22,17 @@ class App < Jsonatra::Base
 
   post '/report' do
     param_error :date, 'missing', 'date parameter required' if params[:date].blank?
-    param_error :date, 'invalid', 'date parameter should look like YYYY-MM-DD' unless params[:date] && params[:date].match(/^\d{4}-\d{2}-\d{2}$/)
+    param_error :date, 'invalid', 'date parameter should look like YYYY-MM-DD or "YYYY-MM-DD HH:mm:ss"' unless params[:date] && (params[:date].match(/^\d{4}-\d{2}-\d{2}$/) or params[:date].match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/))
     # group_id is allowed to be null
     param_error :client_id, 'missing', 'client_id parameter required' if params[:client_id].blank?
     param_error :key, 'missing', 'key parameter required' if params[:key].blank?
     param_error :value, 'missing', 'value parameter required' if params[:value].blank?
     param_error :number, 'missing', 'number parameter required' if params[:number].blank?
     param_error :number, 'invalid', 'number must be an integer' unless params[:number] && params[:number].to_s.match(/^[0-9]+$/)
+
+    params[:precision] = 'day' if params[:precision].blank?
+
+    param_error :precision, 'invalid', 'precision must be day or hour' unless ['day','hour'].include? params[:precision]
 
     halt if response.error?
 

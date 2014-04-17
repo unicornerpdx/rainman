@@ -21,7 +21,8 @@ API
 
 ### `POST /report`
 
-* date - YYYY-MM-DD
+* date - "YYYY-MM-DD" or "YYYY-MM-DD HH:mm:ss"
+* precision - day or hour (defaults to day if not specified)
 * group_id - String (can be null)
 * client_id - String
 * key - String
