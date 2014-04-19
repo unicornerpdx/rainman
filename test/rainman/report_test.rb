@@ -42,14 +42,22 @@ class ReportTest < MiniTest::Unit::TestCase
     post '/report', { date: '20131201' }
     response = JSON.parse last_response.body
     assert_equal 'invalid', response['error']['parameters']['date'][0]['type']
+
+    post '/report', { date: '2013-12-01', precision: 'hour' }
+    response = JSON.parse last_response.body
+    assert_equal 'invalid', response['error']['parameters']['date'][0]['type']
+
+    post '/report', { date: '2013-12-01 11:22:33', precision: 'day' }
+    response = JSON.parse last_response.body
+    assert_equal 'invalid', response['error']['parameters']['date'][0]['type']
   end
 
   def test_report_accepts_valid_date
-    post '/report', { date: '2013-12-01' }
+    post '/report', { date: '2013-12-01', precision: 'day' }
     response = JSON.parse last_response.body
     assert_nil response['error']['parameters']['date']
 
-    post '/report', { date: '2013-12-01 11:22:33' }
+    post '/report', { date: '2013-12-01 11:22:33', precision: 'hour' }
     response = JSON.parse last_response.body
     assert_nil response['error']['parameters']['date']
   end
@@ -195,7 +203,7 @@ class ReportTest < MiniTest::Unit::TestCase
   def test_report_segments_data_by_hour
     post '/report', {
       client_id: 'client-1',
-      date: '2014-01-01 10:00:00',
+      date: '2014-01-01 10:20:00',
       precision: 'hour',
       key: 'version',
       value: '1.0',
@@ -204,7 +212,7 @@ class ReportTest < MiniTest::Unit::TestCase
 
     post '/report', {
       client_id: 'client-1',
-      date: '2014-01-01 11:00:00',
+      date: '2014-01-01 11:40:00',
       precision: 'hour',
       key: 'version',
       value: '1.0',
@@ -212,8 +220,10 @@ class ReportTest < MiniTest::Unit::TestCase
     }
 
     assert_equal 2, STATS.filter(client_id: 'client-1').count
+    assert_equal 0, STATS.filter(client_id: 'client-1', date: '2014-01-01', hour: 9).count
     assert_equal 5, STATS.filter(client_id: 'client-1', date: '2014-01-01', hour: 10).first[:num]
     assert_equal 6, STATS.filter(client_id: 'client-1', date: '2014-01-01', hour: 11).first[:num]
+    assert_equal 2, STATS.filter(client_id: 'client-1', date: '2014-01-01').count
   end
 
   def test_report_segments_data_by_value
