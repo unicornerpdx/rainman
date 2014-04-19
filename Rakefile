@@ -25,7 +25,7 @@ namespace :db do
 
   task :add_migrations do
     SQL.run 'CREATE TABLE "schema_info" ("version" integer DEFAULT 0 NOT NULL);'
-    SQL.run 'INSERT INTO schema_info VALUES 1;'
+    SQL.run 'INSERT INTO schema_info VALUES(1);'
   end
 
 end
