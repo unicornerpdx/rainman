@@ -109,6 +109,18 @@ class ReportTest < MiniTest::Unit::TestCase
     assert_equal 'number must be an integer', response['error']['parameters']['number'][0]['message']
   end
 
+  def test_report_removes_invalid_utf8_chars
+    post '/report', { 
+      client_id: 'client-9',
+      date: '2014-01-01',
+      key: 'name',
+      value: "servi\xE7o",
+      number: 1
+    }
+    response = JSON.parse last_response.body
+    assert_equal 1, STATS.filter(client_id: 'client-9').count
+  end
+
   def test_report_accepts_group_id
     post '/report', { group_id: '10000' }
     response = JSON.parse last_response.body
