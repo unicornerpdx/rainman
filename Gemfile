@@ -8,6 +8,7 @@ gem 'pg'
 gem 'sequel'
 gem 'logger'
 gem 'rake'
+gem 'scrub_rb'
 
 gem 'puma'
 gem 'shotgun'

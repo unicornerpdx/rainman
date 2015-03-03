@@ -51,6 +51,8 @@ class App < Jsonatra::Base
 
     halt if response.error?
 
+    params[:value] = params[:value].scrub
+
     if params[:precision] == 'day'
       SQL.call :update_stat, :number => params[:number], :group => (params[:group_id] || ''), :client => params[:client_id], :date => params[:date], :key => params[:key], :value => params[:value]
       SQL.call :insert_stat, :number => params[:number], :group => (params[:group_id] || ''), :client => params[:client_id], :date => params[:date], :key => params[:key], :value => params[:value]
