@@ -121,6 +121,34 @@ class ReportTest < MiniTest::Unit::TestCase
     assert_equal 1, STATS.filter(client_id: 'client-9').count
   end
 
+  def test_report_accepts_number_as_value
+    post '/report', {
+      client_id: 'client-9',
+      date: '2014-01-01',
+      key: 'id',
+      value: 100,
+      number: 1
+    }.to_json, {
+      'CONTENT_TYPE' => 'application/json'
+    }
+    response = JSON.parse last_response.body
+    assert_equal 1, STATS.filter(client_id: 'client-9').count
+  end
+
+  def test_report_accepts_number_as_key
+    post '/report', {
+      client_id: 'client-9',
+      date: '2014-01-01',
+      key: 1000,
+      value: 'foo',
+      number: 1
+    }.to_json, {
+      'CONTENT_TYPE' => 'application/json'
+    }
+    response = JSON.parse last_response.body
+    assert_equal 1, STATS.filter(client_id: 'client-9').count
+  end
+
   def test_report_accepts_group_id
     post '/report', { group_id: '10000' }
     response = JSON.parse last_response.body
