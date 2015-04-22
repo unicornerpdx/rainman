@@ -12,6 +12,12 @@ class ReportTest < MiniTest::Unit::TestCase
     App
   end
 
+  def content_type_json
+    {
+      'CONTENT_TYPE' => 'application/json'
+    }
+  end
+
   def test_hello_world
     get '/' 
     assert last_response.ok?
@@ -48,6 +54,10 @@ class ReportTest < MiniTest::Unit::TestCase
     assert_equal 'invalid', response['error']['parameters']['date'][0]['type']
 
     post '/report', { date: '2013-12-01 11:22:33', precision: 'day' }
+    response = JSON.parse last_response.body
+    assert_equal 'invalid', response['error']['parameters']['date'][0]['type']
+
+    post '/report', { date: 3 }.to_json, content_type_json
     response = JSON.parse last_response.body
     assert_equal 'invalid', response['error']['parameters']['date'][0]['type']
   end
@@ -128,9 +138,7 @@ class ReportTest < MiniTest::Unit::TestCase
       key: 'id',
       value: 100,
       number: 1
-    }.to_json, {
-      'CONTENT_TYPE' => 'application/json'
-    }
+    }.to_json, content_type_json
     response = JSON.parse last_response.body
     assert_equal 1, STATS.filter(client_id: 'client-9').count
   end
