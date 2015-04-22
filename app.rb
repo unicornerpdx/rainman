@@ -44,9 +44,9 @@ class App < Jsonatra::Base
 
     # If precision is "hour" then the date must be a full timestamp
     if params[:precision] == 'day'
-      param_error :date, 'invalid', 'date parameter should look like YYYY-MM-DD for day precision' unless params[:date] && params[:date].match(/^\d{4}-\d{2}-\d{2}$/)
+      param_error :date, 'invalid', 'date parameter should look like YYYY-MM-DD for day precision' unless params[:date] && params[:date].to_s.match(/^\d{4}-\d{2}-\d{2}$/)
     else
-      param_error :date, 'invalid', 'date parameter should look like "YYYY-MM-DD HH:mm:ss" for hour precision' unless params[:date] && params[:date].match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
+      param_error :date, 'invalid', 'date parameter should look like "YYYY-MM-DD HH:mm:ss" for hour precision' unless params[:date] && params[:date].to_s.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
     end
 
     halt if response.error?
@@ -71,8 +71,8 @@ class App < Jsonatra::Base
   get '/query' do
     param_error :keys, 'missing', 'keys parameter required' if params[:keys] == nil || params[:keys].size == 0
     param_error :value, 'invalid', 'value parameter cannot be specified when requesting multiple keys' if (params[:value] || !params[:value].blank?) and params[:keys].size > 1
-    param_error :from, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:from] && !params[:from].match(/^\d{4}-\d{2}-\d{2}$/)
-    param_error :to, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:to] && !params[:to].match(/^\d{4}-\d{2}-\d{2}$/)
+    param_error :from, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:from] && !params[:from].to_s.match(/^\d{4}-\d{2}-\d{2}$/)
+    param_error :to, 'invalid', 'date parameter should look like YYYY-MM-DD' if params[:to] && !params[:to].to_s.match(/^\d{4}-\d{2}-\d{2}$/)
 
     # jsonatra doesn't split query string parameters into an array right now
     # https://github.com/esripdx/jsonatra/issues/3
